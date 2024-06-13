@@ -35,7 +35,7 @@ data = {'Time' : [], "State": [], "Lox High": [], "Fuel High": [], "Lox Dome": [
 
 df = pandas.DataFrame(data)
 
-canDump = open("WaterflowCANDump.txt", "r")
+canDump = open("Candump_To_Csv/WaterflowCANDump.txt", "r")
 newLine = {
     'Time' : -1, "State": -1, "Lox High": -1, "Fuel High": -1, "Lox Dome": -1, "Fuel Dome": -1, "Lox Tank1": -1, "Lox Tank2": -1, "Lox Tank2": -1,\
         "Fuel Tank1": -1, "Fuel Tank2": -1, "Pneumatics": -1, "Lox Inlet": -1, "Fuel Inlet": -1, "Fuel Injector": -1, "Chamber1": -1, "Chamber2": -1
