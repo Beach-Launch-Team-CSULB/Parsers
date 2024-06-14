@@ -52,7 +52,7 @@ def readSensor(line):
     
     for I in range(len(sensorID[int(line[1], 16)])):
         name = sensorID[int(line[1], 16)][I]
-        val = int(line[3 + I*2] + line[4 + I*2],16)
+        val = int(str(int(line[3 + I*2],16)) + str(int(line[4 + I*2],16)))
         
         #converting raw val
         val = (val * conversionVals[name][0]) + conversionVals[name][1]
