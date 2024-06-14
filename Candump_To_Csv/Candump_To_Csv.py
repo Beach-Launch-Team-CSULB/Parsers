@@ -16,10 +16,11 @@ cmdID = {
     0: "ABORT",
     1: "VENT",
     2: "FIRE",
-    3: "Tank PRESS",
-    4: "STANDBY",
-    5: "PASSIVE",
-    6: "TEST"
+    3: "TANK_PRESS",
+    4: "HIGH_PRESS",
+    5: "STAND_BY",
+    6: "IGNITE",
+    7: "TEST"
 }
 #Sensor report
 sensorID = {        #2 bytes will be one raw sensor value
@@ -29,23 +30,36 @@ sensorID = {        #2 bytes will be one raw sensor value
     132: ['Chamber1', 'Chamber2']         #Eng Node Sensors 5-8 
 }
 
+conversionVals = { #[M,B]
+    'Time' : [1.0,0.0], "State": [1.0,0.0], "Lox High": [0.0956, -625.0], "Fuel High": [0.0939, -604.0], "Lox Dome": [0.0197, 143.0], "Fuel Dome": [0.0191, -123.0], "Lox Tank1": [0.02, -131.0], "Lox Tank2": [0.02, -134.0],\
+    "Fuel Tank1": [0.0191, -134.0], "Fuel Tank2": [0.0192, -125.0], "Pneumatics": [0.0195, -121.0], "Lox Inlet": [0.0195, -0], "Fuel Inlet": [0.019, -0], "Fuel Injector": [0.0194, -0], "Chamber1": [0.0194, -0], "Chamber2": [0.0195, -0]
+    }
+
 #--------------------------------------------------------------
-data = {'Time' : [], "State": [], "Lox High": [], "Fuel High": [], "Lox Dome": [], "Fuel Dome": [], "Lox Tank1": [], "Lox Tank2": [], "Lox Tank2": [],\
+data = {'Time' : [], "State": [], "Lox High": [], "Fuel High": [], "Lox Dome": [], "Fuel Dome": [], "Lox Tank1": [], "Lox Tank2": [],\
     "Fuel Tank1": [], "Fuel Tank2": [], "Pneumatics": [], "Lox Inlet": [], "Fuel Inlet": [], "Fuel Injector": [], "Chamber1": [], "Chamber2": []}
 
 df = pandas.DataFrame(data)
 
 canDump = open("Candump_To_Csv/WaterflowCANDump.txt", "r")
 newLine = {
-    'Time' : -1, "State": -1, "Lox High": -1, "Fuel High": -1, "Lox Dome": -1, "Fuel Dome": -1, "Lox Tank1": -1, "Lox Tank2": -1, "Lox Tank2": -1,\
+    'Time' : -1, "State": -1, "Lox High": -1, "Fuel High": -1, "Lox Dome": -1, "Fuel Dome": -1, "Lox Tank1": -1, "Lox Tank2": -1,\
         "Fuel Tank1": -1, "Fuel Tank2": -1, "Pneumatics": -1, "Lox Inlet": -1, "Fuel Inlet": -1, "Fuel Injector": -1, "Chamber1": -1, "Chamber2": -1
 } 
 
+
 def readSensor(line):
-    name = None
+    
     for I in range(len(sensorID[int(line[1], 16)])):
-        rawVal = line[3 + I] + line[4 + I]
-        newLine[sensorID[int(line[1], 16)][I]] = int(rawVal,16)
+        name = sensorID[int(line[1], 16)][I]
+        val = int(line[3 + I*2] + line[4 + I*2],16)
+        
+        #converting raw val
+        val = (val * conversionVals[name][0]) + conversionVals[name][1]
+        val = round(val, 2)
+        newLine[name] = val
+
+
     return 1
 print("Starting parse")
 for line in canDump:
